@@ -20,19 +20,21 @@ from rich import print as rprint
 ##########################
 # Script Arguments
 ##########################
-parser = argparse.ArgumentParser(description="Check device reboot reason")
+'''parser = argparse.ArgumentParser(description="Check device reboot reason")
 parser.add_argument('-u', '--username', type=str, metavar='',\
     help='Username to access network device', required=True)
 parser.add_argument('-p', '--password', type=str, metavar='',\
     help='Password to access network device', required=True)
-args = parser.parse_args()
+args = parser.parse_args()'''
 
 
 ##########################
 # Global Variables
 ##########################
-username = args.username
-password = args.password
+#username = args.username
+username = 'cisco'
+#password = args.password
+password = 'cisco'
 results_frame = pd.DataFrame()
 SW_REPORT_FILE = "./device_list.csv"
 
@@ -40,7 +42,8 @@ SW_REPORT_FILE = "./device_list.csv"
 #############################
 # Get only supported devices
 #############################
-def get_supported_devices(solarwinds_results, region):
+def get_supported_devices(solarwinds_results):
+    global data_frame
     '''
     Capture only the supported devices(IOS/IOS-XE/NXOS) from Solarwinds device query report
         - solarwinds_results => csv report that was generated from
@@ -55,9 +58,11 @@ def get_supported_devices(solarwinds_results, region):
         "WsSvcFwm1sc",
         "ASA"
     ]
-    rprint(f"[yellow]Getting supported devices from {solarwinds_results}...[/yellow]")
+    rprint(f"[yellow]Getting supported devices from {SW_REPORT_FILE}...[/yellow]")
     data_frame = pd.read_csv(solarwinds_results)
-    data_frame = data_frame[data_frame.Region == region].sort_values(by="Device Name",\
+    #data_frame = data_frame[data_frame.Region == region].sort_values(by="Device Name",\
+                #ascending=True)
+    data_frame = data_frame.sort_values(by="Device Name",\
                 ascending=True)
     data_frame = data_frame[~data_frame["Machine Type"].str.contains('|'.join(unsupported_devices))]
     data_frame["Reload reason"] = ""
@@ -107,12 +112,12 @@ def main():
     Main Script
     '''
     global results_frame
-    for region in ["US", "EMEA", "APAC"]:
-        rprint(f"{'#'*7} PROCESSING {region} {'#'*7}")
-        region_dev_frame = get_supported_devices(SW_REPORT_FILE, region)
-        region_devices = [device for _, device in region_dev_frame.iterrows()]
-        with ThreadPoolExecutor(max_workers=100) as executor:
-            executor.map(get_reboot_reason, region_devices)
+    #for region in ["US", "EMEA", "APAC"]:
+        #rprint(f"{'#'*7} PROCESSING {region} {'#'*7}")
+    region_dev_frame = get_supported_devices(SW_REPORT_FILE)
+    region_devices = [device for _, device in region_dev_frame.iterrows()]
+    with ThreadPoolExecutor(max_workers=100) as executor:
+        executor.map(get_reboot_reason, region_devices)
 
     # Analyze data and capture only abnormal reloads
     abnormal_status = [

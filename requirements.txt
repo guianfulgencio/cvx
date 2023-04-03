@@ -1,5 +1,6 @@
 XlsxWriter==3.0.1
 rich==10.1.0
-orionsdk==0.3.0
+orionsdk
 napalm==3.2.0
 pandas==1.1.5
+
