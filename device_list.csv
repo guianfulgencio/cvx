@@ -1,4 +1,4 @@
-Device Name,IP Address,Machine Type,IOS Version,Region
-csr1kv1,172.20.10.13,Cisco Catalyst 9300 Series Switch,"17.3.5, RELEASE SOFTWARE (fc2)",APAC
-csr1kv2,172.20.10.7,Cisco Catalyst 9300 Series Switch,"17.3.5, RELEASE SOFTWARE (fc2)",US
-csr1kv3,172.20.10.12,Cisco Catalyst 9300 Series Switch,"17.3.5, RELEASE SOFTWARE (fc2)",EMEA
+Device Name,IP Address,Region
+csr1kv1,172.20.10.13,APAC
+csr1kv2,172.20.10.7,US
+csr1kv3,172.20.10.12,EMEA

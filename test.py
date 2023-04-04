@@ -49,7 +49,7 @@ def get_supported_devices(solarwinds_results):
         - solarwinds_results => csv report that was generated from
                                 get_device_list_from_all_region.py script (device_list.csv)
     '''
-    unsupported_devices = [
+    '''unsupported_devices = [
         "Cisco Unified Communications Manager",
         "WLC",
         "Wireless",
@@ -58,15 +58,15 @@ def get_supported_devices(solarwinds_results):
         "WsSvcFwm1sc",
         "ASA",
         "Nexus"
-    ]
+    ]'''
     rprint(f"[yellow]Getting supported devices from {SW_REPORT_FILE}...[/yellow]")
     data_frame = pd.read_csv(solarwinds_results)
     #data_frame = data_frame[data_frame.Region == region].sort_values(by="Device Name",\
                 #ascending=True)
     data_frame = data_frame.sort_values(by="Device Name",\
                 ascending=True)
-    data_frame = data_frame[~data_frame["Machine Type"].str.contains('|'.join(unsupported_devices))]
-    data_frame["Reload reason"] = ""
+    #data_frame = data_frame[~data_frame["Machine Type"].str.contains('|'.join(unsupported_devices))]
+    data_frame["SNMP config"] = ""
     return data_frame
 
 
@@ -84,7 +84,7 @@ def get_reboot_reason(device_data):
     #os_ver = "nxos_ssh" if "Nexus" in device_data["Machine Type"] else "ios"
     os_ver = "ios"
     #cli_command = ["show version | i Reason"] if os_ver == 'nxos_ssh' else ["show version | i reason:"]
-    cli_command = ["show version | i reason:"]
+    cli_command = ["show run | inc snmp-server"]
     driver = get_network_driver(os_ver)
     device = driver(
         hostname=ip_address,
@@ -95,13 +95,14 @@ def get_reboot_reason(device_data):
     try:
         device.open()
         cli_output = device.cli(cli_command)
-        reload_reason = cli_output[cli_command[0]].replace("Reason:", "")
-        reload_reason = reload_reason.replace("Last reload reason:", "")
-        device_data["Reload reason"] = reload_reason.strip()
+        snmp_config = cli_output[cli_command[0]]
+        #reload_reason = cli_output[cli_command[0]].replace("snmp-server", "")
+        #reload_reason = reload_reason.replace("Last reload reason:", "")
+        device_data["SNMP config"] = snmp_config.strip()
         device.close()
-        rprint(f"✅ {hostname} :: {reload_reason}")
+        rprint(f"✅ {hostname} :: {snmp_config}")
     except Exception as err:
-        device_data["Reload reason"] = err
+        device_data["SNMP config"] = err
         rprint(f"❌ {hostname} :: {err}")
 
     results_frame = results_frame.append(device_data)
@@ -136,7 +137,7 @@ def main():
         "Reason unspecified"
     ]'''
     now = datetime.now()
-    report_name = f"Cisco device abnormal reload report {now.strftime('%d-%b-%Y')}.csv"
+    report_name = f"SNMP config report {now.strftime('%d-%b-%Y')}.csv"
     #results_frame = results_frame[results_frame["Reload reason"] != ""]
     #results_frame = results_frame[results_frame["Reload reason"]\
      #               .str.contains('|'.join(abnormal_status), na=False)]

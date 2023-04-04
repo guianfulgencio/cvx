@@ -1,0 +1,10 @@
+Device Name,IP Address,Region,SNMP config
+csr1kv1,172.20.10.13,APAC,
+csr1kv3,172.20.10.12,EMEA,
+csr1kv2,172.20.10.7,US,"snmp-server community public RO
+snmp-server community private RW
+snmp-server community cisco-devnet RO
+snmp-server community cisco-secure RW
+snmp-server location NYC
+snmp-server contact NET_ADMIN
+snmp-server chassis-id"
