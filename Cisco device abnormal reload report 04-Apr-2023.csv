@@ -1,4 +1,0 @@
-Device Name,IOS Version,IP Address,Machine Type,Region,Reload reason
-csr1kv1,"17.3.5, RELEASE SOFTWARE (fc2)",172.20.10.13,Cisco Catalyst 9300 Series Switch,APAC,Unknown reason
-csr1kv3,"17.3.5, RELEASE SOFTWARE (fc2)",172.20.10.12,Cisco Catalyst 9300 Series Switch,EMEA,Unknown reason
-csr1kv2,"17.3.5, RELEASE SOFTWARE (fc2)",172.20.10.7,Cisco Catalyst 9300 Series Switch,US,Unknown reason
