@@ -1,0 +1,2 @@
+Device Name,IP Address,Machine Type,Region,SCP Status
+csr1kv2,172.20.10.12,ios,APAC,ip scp server enable
