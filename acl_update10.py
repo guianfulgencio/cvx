@@ -45,8 +45,7 @@ class AccessListUpdater:
 
             # Check if SSH port is accessible after the change
             if self.check_ssh_port():
-                rprint(f'✅ SSH connection success for device {self.hostname} after change')
-                
+                rprint(f'✅ SSH connection success for device {self.hostname} after change')                
             else:
                 rprint(f'[red]❌ SSH connection failed for device {self.hostname} after change!, rolling back config.')
                 self.device.rollback()
@@ -134,7 +133,7 @@ if __name__ == '__main__':
                     acl_commands = [
                         'no ip access-list ' + acl_name,
                         'ip access-list ' + acl_name,
-                        #'permit ip 172.20.10.0/28 any',
+                        'permit ip 172.20.10.0/28 any',
                         'permit ip 139.65.136.0/22 any',
                         'permit ip 139.65.140.0/22 any',
                         'deny ip any any log'

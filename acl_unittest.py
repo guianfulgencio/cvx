@@ -32,7 +32,7 @@ class AccessListUpdater:
             print('Access list updated successfully!')
 
             # Check if device is still accessible after the change
-            ping_test = self.device.ping(destination='8.8.8.8')
+            ping_test = self.device.ping(destination=hostname)
             if not ping_test['success']:
                 raise Exception('Device is not accessible after change, rolling back config.')
 
@@ -69,7 +69,7 @@ class AccessListUpdater:
 
 class TestAccessListUpdater(unittest.TestCase):
     def setUp(self):
-        self.acl_updater = AccessListUpdater(hostname='192.168.1.1', username='admin', password='password')
+        self.acl_updater = AccessListUpdater(hostname='172.20.10.5', username='cisco', password='cisco')
 
     def test_has_password_of_last_resort(self):
         has_password_of_last_resort = self.acl_updater.has_config_line('password 7 ')
