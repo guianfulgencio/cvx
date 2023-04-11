@@ -1,12 +1,12 @@
 import csv
-import paramiko
+import argparse
 from napalm import get_network_driver
 from rich import print as rprint
 from concurrent.futures import ThreadPoolExecutor
 import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime
-
+from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
 
 
 class AccessListUpdater:
@@ -15,6 +15,7 @@ class AccessListUpdater:
         self.device_name = device_name
         self.username = username
         self.password = password
+        self.device_type = device_type
         self.driver = get_network_driver(device_type)
         self.device = None
 
@@ -65,31 +66,40 @@ class AccessListUpdater:
             if file.tell() == 0:
                 writer.writeheader()
             writer.writerow(report_row)
-
+        
     def check_ssh_port(self):
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        if self.device_type == 'ios':
+            device_type = 'cisco_ios'
+        elif self.device_type  == 'nxos_ssh':
+            device_type = 'cisco_nxos'
+        else:
+            device_type = self.device_type
+        device = {
+            'device_type': device_type,
+            'ip': self.hostname,
+            'username': self.username,
+            'password': self.password,
+        }
         try:
-            ssh.connect(self.hostname, username=self.username, password=self.password, timeout=5)
-            transport = ssh.get_transport()
-            transport.send_ignore()
-            ssh.close()
-            return True
-        except:
-            ssh.close()
+            with ConnectHandler(**device) as conn:
+                conn.find_prompt()
+                return True
+        except (NetmikoTimeoutException, NetmikoAuthenticationException):
             return False
 
-    '''def send_email(body):
-        msg = MIMEText(body)
-        msg['Subject'] = 'ACL Update Report'
-        msg['From'] = 'no-reply@chevron.com'
-        msg['To'] = 'gfulgencio@chevron.com'
-        s = smtplib.SMTP('smtp.example.com')
-        s.send_message(msg)
-        s.quit()'''
-
-
 if __name__ == '__main__':
+    ##########################
+    # Script Arguments
+    ##########################
+    parser = argparse.ArgumentParser(description="Credential to update ACL")
+    parser.add_argument('-u', '--username', type=str, metavar='',\
+        help='Username to access network device', required=True)
+    parser.add_argument('-p', '--password', type=str, metavar='',\
+        help='Password to access network device', required=True)
+    args = parser.parse_args()
+    username = args.username
+    password = args.password
+
     with open('devices.csv', 'r') as file:
         reader = csv.DictReader(file)
         with ThreadPoolExecutor(max_workers=100) as executor:
@@ -101,7 +111,7 @@ if __name__ == '__main__':
                 else:
                     device_type = 'ios'
 
-                acl_updater = AccessListUpdater(hostname=row['IP Address'], device_name=row['Device Name'], username='cisco', password='cisco',
+                acl_updater = AccessListUpdater(hostname=row['IP Address'], device_name=row['Device Name'], username=username, password=password,
                                                 device_type=device_type)
                 acl_updater.connect()
 
