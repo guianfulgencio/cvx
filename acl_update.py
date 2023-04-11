@@ -9,8 +9,6 @@ from datetime import datetime
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
 
 
-
-
 class AccessListUpdater:
     def __init__(self, hostname, device_name, username, password, device_type='ios'):
         self.hostname = hostname
@@ -101,16 +99,6 @@ class AccessListUpdater:
                 return True
         except (NetmikoTimeoutException, NetmikoAuthenticationException):
             return False
-
-    '''def send_email(body):
-        msg = MIMEText(body)
-        msg['Subject'] = 'ACL Update Report'
-        msg['From'] = 'no-reply@chevron.com'
-        msg['To'] = 'gfulgencio@chevron.com'
-        s = smtplib.SMTP('smtp.example.com')
-        s.send_message(msg)
-        s.quit()'''
-
 
 if __name__ == '__main__':
     with open('devices.csv', 'r') as file:
