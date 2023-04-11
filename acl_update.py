@@ -83,8 +83,14 @@ class AccessListUpdater:
             return False'''
         
     def check_ssh_port(self):
+        if self.device_type == 'ios':
+            device_type = 'cisco_ios'
+        elif self.device_type  == 'nxos_ssh':
+            device_type = 'cisco_nxos'
+        else:
+            device_type = self.device_type
         device = {
-            'device_type': 'cisco_ios',
+            'device_type': device_type,
             'ip': self.hostname,
             'username': self.username,
             'password': self.password,
