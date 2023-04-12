@@ -20,10 +20,14 @@ class AccessListUpdater:
         self.device = None
 
     def connect(self):
-        self.device = self.driver(hostname=self.hostname, username=self.username, password=self.password)
-        print(f"Connecting to {self.hostname}...")
-        self.device.open()
-
+        try:
+            self.device = self.driver(hostname=self.hostname, username=self.username, password=self.password)
+            print(f"Connecting to {self.hostname}...")
+            self.device.open()
+        except Exception as e:
+            print(f"Error connecting to {self.hostname}: {str(e)}")
+            self.device = None
+            
     def disconnect(self):
         self.device.close()
         self.device = None
